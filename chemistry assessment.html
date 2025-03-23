@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grade 10: Chemical Equations Self Assessment</title>
+    <style>
+        body {
+            background-color: white;
+            font-family: Arial, sans-serif;
+        }
+        h1 {
+            text-align: center;
+            color: #e60000; /* Vodacom red */
+            margin-top: 20px;
+        }
+        .container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+        .letter {
+            width: 15px;
+            height: 15px;
+            border-radius: 30px;
+            background-color: #ccc; /* Neutral color */
+            padding: 1px 3px;
+            color: white;
+            margin-right: 10px;
+        }
+        input:checked + .letter {
+            background-color: #999; /* Slightly darker neutral color */
+        }
+        .labelQ:hover {
+            cursor: pointer;
+        }
+        .btn-primary {
+            background-color: #e60000; /* Vodacom red */
+            border-color: #e60000; /* Vodacom red */
+        }
+        .btn-primary:hover {
+            background-color: #b30000; /* Darker red */
+            border-color: #b30000; /* Darker red */
+        }
+        button {
+            font-size: 1.2rem;
+            font-weight: bolder;
+            width: 100%;
+            border: none;
+            padding: 1rem;
+            margin-top: 20px;
+            border-radius: 5px;
+            color: white;
+        }
+        #score {
+            text-align: center;
+            font-size: 2rem;
+            font-weight: bold;
+            color: #e60000; /* Vodacom red */
+            margin-top: 20px;
+        }
+        .correct-answer {
+            display: none;
+            color: green;
+            font-weight: bold;
+        }
+        .question-group {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Self Assessment</h1>
+    <div class="container">
+        <div id="score"></div>
+        <form>
+            <div id="quiz" class="container"></div>
+        </form>
+        <button type="button" class="btn btn-primary" onclick="validateAnswers()">Submit Answers</button>
+        <button type="button" class="btn btn-secondary mt-3" onclick="restartQuiz()">Restart Quiz</button>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        const quiz = [
+            {
+                "number": 1,
+                "question": "What is a chemical equation?",
+                "answers": [
+                    "A representation of a chemical reaction",
+                    "A method to measure voltage",
+                    "A type of resistor",
+                    "A device that stores electrical energy"
+                ],
+                "correct": "A representation of a chemical reaction",
+                "tip": "A chemical equation is a representation of a chemical reaction."
+            },
+            {
+                "number": 2,
+                "question": "What are the components of a chemical equation?",
+                "answers": [
+                    "Reactants and products",
+                    "Voltage and current",
+                    "Resistors and capacitors",
+                    "Energy and power"
+                ],
+                "correct": "Reactants and products",
+                "tip": "Reactants are found to the left of the arrow and products are found to the right of the arrow."
+            },
+            {
+                "number": 3,
+                "question": "How are chemical equations balanced?",
+                "answers": [
+                    "By adding big numbers at the start of the reactant or product",
+                    "By measuring voltage",
+                    "By using resistors",
+                    "By storing electrical energy"
+                ],
+                "correct": "By adding big numbers at the start of the reactant or product",
+                "tip": "Chemical equations are balanced by adding big numbers at the start of the reactant or product."
+            },
+            {
+                "number": 4,
+                "question": "What do state symbols in a chemical equation represent?",
+                "answers": [
+                    "Solid, liquid, gas, and aqueous solution",
+                    "Voltage, current, resistance, and power",
+                    "Energy, power, work, and force",
+                    "Reactants, products, atoms, and molecules"
+                ],
+                "correct": "Solid, liquid, gas, and aqueous solution",
+                "tip": "State symbols show if a substance is a solid, liquid, gas, or aqueous solution."
+            },
+            {
+                "number": 5,
+                "question": "What is an ionic equation?",
+                "answers": [
+                    "An equation showing the ions involved in a reaction",
+                    "A method to measure voltage",
+                    "A type of resistor",
+                    "A device that stores electrical energy"
+                ],
+                "correct": "An equation showing the ions involved in a reaction",
+                "tip": "An ionic equation shows the ions involved in a reaction."
+            }
+        ];
+
+        const initialize = () => {
+            const myQuiz = document.querySelector("#quiz");
+            let quizRender = '';
+
+            quiz.map((question, id) => {
+                quizRender += `
+                <div class="question-group">
+                    <h3 class="question">${question.number}. ${question.question}</h3>
+                    <ul class="list-group">
+                        <label class="labelQ list-group-item">
+                            <input type="radio" id="${question.number}" name="question${id}" value="${question.answers[0]}">
+                            <span class="letter">A</span><span class="question">${question.answers[0]}</span><span class="verif${question.number}"></span>
+                        </label><br>
+                        <label class="labelQ list-group-item">
+                            <input type="radio" id="${question.number}" name="question${id}" value="${question.answers[1]}">
+                            <span class="letter">B</span><span class="question">${question.answers[1]}</span><span class="verif${question.number}"></span>
+                        </label><br>
+                        <label class="labelQ list-group-item">
+                            <input type="radio" id="${question.number}" name="question${id}" value="${question.answers[2]}">
+                            <span class="letter">C</span><span class="question">${question.answers[2]}</span><span class="verif${question.number}"></span>
+                        </label><br>
+                        <label class="labelQ list-group-item">
+                            <input type="radio" id="${question.number}" name="question${id}" value="${question.answers[3]}">
+                            <span class="letter">D</span><span class="question">${question.answers[3]}</span><span class="verif${question.number}"></span>
+                        </label><br>
+                    </ul>
+                    <div class="correct-answer" id="correct${question.number}">${question.number}: Correct answer: ${question.correct}</div>
+                </div>`;
+            });
+
+            myQuiz.innerHTML = quizRender;
+        };
+
+        const validateAnswers = () => {
+            const allInputChecked = document.querySelectorAll('input:checked');
+            let score = 0;
+
+            allInputChecked.forEach((inputValue, index) => {
+                const correctAnswerElement = document.getElementById(`correct${quiz[index].number}`);
+                correctAnswerElement.style.display = 'block';
+
+                if (inputValue.value === quiz[index].correct) {
+                    inputValue.nextElementSibling.nextElementSibling.nextElementSibling.textContent = " Correct :)";
+                    inputValue.nextElementSibling.nextElementSibling.nextElementSibling.style.color = "green";
+                    inputValue.nextElementSibling.nextElementSibling.style.color = "green";
+                    score++;
+                } else {
+                    inputValue.nextElementSibling.nextElementSibling.nextElementSibling.textContent = " Incorrect :(";
+                    inputValue.nextElementSibling.nextElementSibling.style.color = "red";
+                    inputValue.nextElementSibling.nextElementSibling.nextElementSibling.style.color = "red";
+                    inputValue.nextElementSibling.nextElementSibling.style.textDecoration = "none";
+                }
+            });
+
+            document.getElementById('score').textContent = `You scored ${score} out of ${quiz.length}.`;
+        };
+
+        const restartQuiz = () => {
+            document.getElementById('score').textContent = '';
+            initialize();
+        };
+
+        $(document).ready(function() {
+            initialize();
+        });
+    </script>
+</body>
+</html>
